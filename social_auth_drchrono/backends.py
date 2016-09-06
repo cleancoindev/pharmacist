@@ -4,7 +4,7 @@ from social.backends.oauth import BaseOAuth2
 
 class drchronoOAuth2(BaseOAuth2):
     """drchrono OAuth authentication backend"""
-    name = os.environ.get('DRCHRONO_NAME')
+    name = 'drchrono'
     ID_KEY = os.environ.get('DRCHRONO_CLIENT_ID')
     AUTHORIZATION_URL = 'https://drchrono.com/o/authorize/'
     ACCESS_TOKEN_URL = 'https://drchrono.com/o/token/'
