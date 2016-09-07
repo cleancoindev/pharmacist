@@ -1,7 +1,7 @@
 import requests, urllib
 from django.forms import model_to_dict
 from email import send_appt_email, send_refill_email
-from models import Patient, Medication
+from models import Patient, Medication, AuditLog
 
 
 endpoint_models = {
@@ -61,7 +61,7 @@ def get_all(user, endpoint, parameters={}, patient=None):
             new_model.save_from_dict(item)
             all_objs.append(new_model)
 
-    return all_objs.values()
+    return all_objs
 
 def update(user, endpoint, item_id, parameters):
     social = user.social_auth.get(user=user)
@@ -82,8 +82,11 @@ def dispense_med(user, form, med_id, qty):
 
     # You can't PATCH a medication over the API, so can't actually update the refills -- name a note instead
     # update(user, 'medications', med_id, {'number_refills': new_refills})
-    text = str(med.number_refills) + ' refills remain'
-    update(user, 'medications/{0}/append_to_pharmacy_note'.format(med_id), None, {'text': text})
+    note_text = str(med.number_refills) + ' refills remain'
+    update(user, 'medications/{0}/append_to_pharmacy_note'.format(med_id), None, {'text': note_text})
+
+    log_text = 'dispensed {0} x {1} to {2} {3}'.format(qty, med.name, patient.first_name, patient.last_name)
+    AuditLog(user=user, text=log_text).save()
 
     # If the remaining refills drops below 2, send a reminder email
     if med.number_refills < 2:
@@ -94,3 +97,5 @@ def dispense_med(user, form, med_id, qty):
             # Regular refill reminder without an appointment needed
             send_refill_email(patient, med)
 
+        log_text = 'sent reminder email to {0} {1} at {2}'.format(patient.first_name, patient.last_name, patient.email)
+        AuditLog(user=user, text=log_text).save()

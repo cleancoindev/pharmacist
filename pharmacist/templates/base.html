@@ -23,6 +23,7 @@
       <div id="login-info">
         {% if request.user.is_authenticated %}
           welcome, {{ request.user.username }}! 
+          <a class="btn btn-default btn-xs info" href="{% url 'audit_log' %}">audit log</a>
           <a class="btn btn-success btn-xs info" href="{% url 'logout' %}?next=/">logout</a>
         {% endif %}
       </div>

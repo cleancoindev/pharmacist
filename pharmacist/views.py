@@ -4,12 +4,13 @@ from django.views.generic.edit import FormView
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from drchrono_api import get_one, get_all, dispense_med
+from models import AuditLog
 from forms import MedicationForm
 
 @login_required
 def patient_list(request):
     context = RequestContext(request, {
-        'patient_list': get_all(request.user, 'patients'),
+        'patient_list': get_all(request.user, 'patients').values(),
     })
 
     return render_to_response('patient_list.html', context)
@@ -27,6 +28,14 @@ def dispense(request, patient_id):
     })
 
     return render_to_response('dispense.html', context)
+
+@login_required
+def audit_log(request):
+    context = RequestContext(request, {
+        'audit_log': AuditLog.objects.all(),
+    })
+
+    return render_to_response('audit_log.html', context)
 
 class ModifyView(FormView):
     template_name = 'modify.html'
