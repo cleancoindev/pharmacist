@@ -51,8 +51,5 @@ class ModifyView(FormView):
         qty = int(form.cleaned_data.get('quantity_to_dispense'))
 
         # Update the refill quantity available at Drchrono and send any needed emails
-        if qty > 0:
-            dispense_med(self.request.user, form, med_id, qty)
-
+        dispense_med(self.request.user, form, med_id, qty)
         return super(ModifyView, self).form_valid(form)
-

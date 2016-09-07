@@ -40,7 +40,7 @@ def update(user, endpoint, item_id, parameters):
 
 def dispense_med(user, form, med_id, qty):
     med = get_one(user, 'medications', med_id)
-    patient = get_one(user, 'patients_summary', med['patient'])
+    patient = get_one(user, 'patients', med['patient'])
     new_refills = med['number_refills'] - qty
     text = str(new_refills) + ' refills remain'
 
@@ -49,7 +49,6 @@ def dispense_med(user, form, med_id, qty):
     update(user, 'medications/{0}/append_to_pharmacy_note'.format(med_id), None, {'text': text})
 
     # If the remaining refills drops below 2, send a reminder email
-    print med
     if new_refills < 2:
         # If there's a pharmacy note containing "appt", then send an appointment email
         if 'appt' in med['pharmacy_note'].lower():
