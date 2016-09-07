@@ -9,15 +9,19 @@ from forms import MedicationForm
 
 @login_required
 def patient_list(request):
+    # Make sure all doctors for this user are populated in the DB first
+    get_all(request.user, 'doctors')
+
+    # Now get the patient list and render the page
     context = RequestContext(request, {
-        'patient_list': get_all(request.user, 'patients_summary'),
+        'patient_list': get_all(request.user, 'patients'),
     })
 
     return render_to_response('patient_list.html', context)
 
 @login_required
 def dispense(request, patient_id):
-    patient = get_one(request.user, 'patients_summary', patient_id)
+    patient = get_one(request.user, 'patients', patient_id)
     med_list = get_all(request.user, 'medications', {'patient': patient_id})
     name = '{0} {1}'.format(patient['first_name'], patient['last_name'])
 

@@ -1,30 +1,58 @@
 import requests, urllib
+from django.forms import model_to_dict
 from email import send_appt_email, send_refill_email
+from models import Doctor, Patient, Medication
+
+
+endpoint_models = {
+    'patients': Patient,
+    'medications': Medication,
+    'doctors': Doctor,
+    }
 
 
 def get_one(user, endpoint, item_id, parameters={}):
-    # TODO: wrap this in an error-handler / logger
+    # First, try to retrieve data from our DB if we've retrieved it from the API previously
+    model = endpoint_models[endpoint]
+    try:
+        data = model_to_dict(model.objects.get(item_id=item_id))
+    except:
+        # Get it from the API directly
+        # TODO: wrap this in an error-handler / logger
+        social = user.social_auth.get(user=user)
+        access_token = social.extra_data['access_token']
+        headers = {'Authorization': 'Bearer {0}'.format(access_token)}
+        url = 'https://drchrono.com/api/{0}/{1}?{2}'.format(endpoint, item_id, urllib.urlencode(parameters))
+        data = requests.get(url, headers=headers).json()
 
-    social = user.social_auth.get(user=user)
-    access_token = social.extra_data['access_token']
-    headers = {'Authorization': 'Bearer {0}'.format(access_token)}
-    url = 'https://drchrono.com/api/{0}/{1}?{2}'.format(endpoint, item_id, urllib.urlencode(parameters))
-    data = requests.get(url, headers=headers).json()
+        # Save the item in the DB for future reference
+        model().save_from_dict(data)
     return data
 
 def get_all(user, endpoint, parameters={}):
-    # TODO: wrap this in an error-handler / logger
+    # Try the DB first for data
+    model = endpoint_models[endpoint]
+    try:
+        results = model.objects.values()
+    except:
 
-    social = user.social_auth.get(user=user)
-    access_token = social.extra_data['access_token']
-    headers = {'Authorization': 'Bearer {0}'.format(access_token)}
-    url = 'https://drchrono.com/api/{0}?{1}'.format(endpoint, urllib.urlencode(parameters))
-    results = []
+        # Get it from the API directly
+        # TODO: wrap this in an error-handler / logger
+        social = user.social_auth.get(user=user)
+        access_token = social.extra_data['access_token']
+        headers = {'Authorization': 'Bearer {0}'.format(access_token)}
+        url = 'https://drchrono.com/api/{0}?{1}'.format(endpoint, urllib.urlencode(parameters))
+        results = []
 
-    while url:
-        data = requests.get(url, headers=headers).json()
-        results.extend(data['results'])
-        url = data['next'] # A JSON null on the last page
+        # Fetch the objects one "page" at a time
+        while url:
+            data = requests.get(url, headers=headers).json()
+            results.extend(data['results'])
+            url = data['next'] # A JSON null on the last page
+
+    # Persist the results as individual items in the DB
+    for item in results:
+        model().save_from_dict(item)
     return results
 
 def update(user, endpoint, item_id, parameters):
