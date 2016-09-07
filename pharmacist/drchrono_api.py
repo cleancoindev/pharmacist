@@ -1,13 +1,12 @@
 import requests, urllib
 from django.forms import model_to_dict
 from email import send_appt_email, send_refill_email
-from models import Doctor, Patient, Medication
+from models import Patient, Medication
 
 
 endpoint_models = {
     'patients': Patient,
     'medications': Medication,
-    'doctors': Doctor,
     }
 
 
@@ -26,16 +25,16 @@ def get_one(user, endpoint, item_id, parameters={}):
         data = requests.get(url, headers=headers).json()
 
         # Save the item in the DB for future reference
+        print data
         model().save_from_dict(data)
     return data
 
 def get_all(user, endpoint, parameters={}):
     # Try the DB first for data
     model = endpoint_models[endpoint]
-    try:
-        results = model.objects.values()
-    except:
+    results = model.objects.values()
 
+    if not len(results):
         # Get it from the API directly
         # TODO: wrap this in an error-handler / logger
         social = user.social_auth.get(user=user)

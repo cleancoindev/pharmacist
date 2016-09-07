@@ -9,10 +9,7 @@ from forms import MedicationForm
 
 @login_required
 def patient_list(request):
-    # Make sure all doctors for this user are populated in the DB first
-    get_all(request.user, 'doctors')
-
-    # Now get the patient list and render the page
+    get_all(request.user, 'patients')
     context = RequestContext(request, {
         'patient_list': get_all(request.user, 'patients'),
     })
