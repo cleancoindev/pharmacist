@@ -43,3 +43,8 @@ class Medication(models.Model):
             self.rxnorm = data.get('rxnorm')
             self.number_refills = data.get('number_refills')
             self.save()
+
+class AuditLog(models.Model):
+    user = models.ForeignKey(User)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    text = models.CharField(max_length=255)

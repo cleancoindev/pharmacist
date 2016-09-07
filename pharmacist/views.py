@@ -1,4 +1,3 @@
-import json
 from django.shortcuts import render_to_response
 from django.views.generic import FormView
 from django.views.generic.edit import FormView
@@ -9,7 +8,6 @@ from forms import MedicationForm
 
 @login_required
 def patient_list(request):
-    get_all(request.user, 'patients')
     context = RequestContext(request, {
         'patient_list': get_all(request.user, 'patients'),
     })
@@ -19,14 +17,8 @@ def patient_list(request):
 @login_required
 def dispense(request, patient_id):
     patient = get_one(request.user, 'patients', patient_id)
-    med_list = get_all(request.user, 'medications', {'patient': patient_id})
-    name = '{0} {1}'.format(patient['first_name'], patient['last_name'])
-
-    # create a dict of meds indexed by id
-    med_list_json = {}
-    for m in med_list:
-        med_list_json[m['id']] = m
-    med_list_json = json.dumps(med_list_json)
+    med_list = get_all(request.user, 'medications', {'patient': patient_id}, patient=patient_id)
+    name = '{0} {1}'.format(patient.first_name, patient.last_name)
 
     context = RequestContext(request, {
         'patient_id': patient_id,
