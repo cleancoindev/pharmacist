@@ -1,4 +1,5 @@
 import requests, urllib
+from email import send_appt_email, send_refill_email
 
 
 def get_one(user, endpoint, item_id, parameters={}):
@@ -57,8 +58,3 @@ def dispense_med(user, form, med_id, qty):
             # Regular refill reminder without an appointment needed
             send_refill_email(patient, med)
 
-def send_appt_email(patient, med):
-    pass
-
-def send_refill_email(patient, med):
-    pass
