@@ -26,4 +26,5 @@ urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='index.html'), name='home'),
     url(r'patient_list/', views.patient_list, name='patient_list'),
     url(r'dispense/(?P<patient_id>[0-9]+)/', views.dispense, name='dispense'),
+    url(r'modify/(?P<med_id>[0-9]+)/', views.ModifyView.as_view(), name='modify'),
 ]

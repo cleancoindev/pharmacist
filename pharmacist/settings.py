@@ -117,3 +117,6 @@ SOCIAL_AUTH_DRCHRONO_SECRET = os.environ.get('DRCHRONO_API_SECRET')
 # SOCIAL_AUTH_DRCHRONO_SCOPE = ['patients', 'user']
 
 LOGIN_REDIRECT_URL = '/patient_list'
+
+# Send emails to the console for logging, don't really send them
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
