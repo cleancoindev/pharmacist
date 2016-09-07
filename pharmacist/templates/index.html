@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <div class="home">
+    <div class="row">
+      <div class="small-12 columns">
+        <div class="card text-center">
+          <div class ="card-section">
+            <h1>Welcome to the Pharmacy Dispenser</h1>
+            <p>Connect with your patients through Drchrono to track pharmaceuticals as they're dispensed.</p>
+          </div>
+          <img src="http://i.imgur.com/8LssA0l.png" alt="logo" id="landing-logo">
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="small-12 columns">
+        <div class="card">
+          {% if not request.user.is_authenticated %}
+            <div class="text-center">
+              <a href="{% url 'social:begin' 'drchrono' %}" class="button success" role="button">
+                <div id="login-block" class="panel panel-default">
+                  <h3>
+                    <img src="https://www.drchrono.com/site_media/cb-12264529/img/public/logos/drchrono_logo_dark_1400x399.png"><br>
+                    Log in with Drchrono to begin!
+                  </h3>
+                </div>
+              </a>
+            </div>
+          {% else %}
+            <div class="text-center">
+              <a href="{% url 'patient_list' %}" class="btn btn-success btn-lg" role="button">
+                Begin Dispensing
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

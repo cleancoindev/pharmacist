@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <div class="home">
+    <div class="card text-center">
+      <div class ="card-section">
+        <h1>Patient List</h1>
+
+        <table id="patient-table" class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>id</th>
+              <th>Last Name</th>
+              <th>First Name</th>
+              <th>Doctor</th>
+              <th>Gender</th>
+              <th>DOB</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in patient_list %}
+              <tr>
+                <td>{{ p.id }}</td>
+                <td>{{ p.last_name }}</td>
+                <td>{{ p.first_name }}</td>
+                <td>{{ p.doctor }}</td>
+                <td>{{ p.gender }}</td>
+                <td>{{ p.date_of_birth }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    $(function() {
+      var table = $('#patient-table').DataTable({
+        "info": false,
+        "columnDefs": [
+            {
+                "targets": [0],
+                "visible": false,
+                "searchable": false
+            }
+        ]
+      });
+
+      $('#patient-table tbody tr').click( function () {
+        // assuming the id is in the first column (hidden from display)
+        patient_id = table.row(this).data()[0];
+        if (patient_id) {
+          window.location.href = "/dispense/"+patient_id+'/';
+        }
+      });
+    });
+  </script>
+{% endblock %}

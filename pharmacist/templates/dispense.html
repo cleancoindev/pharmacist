@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <div class="home">
+    <div class="card text-center">
+      <div class ="card-section">
+        <h1>Manage Medications</h1>
+
+        <table id="med-table" class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>Medication</th>
+              <th>RxNorm</th>
+              <th>Dispense</th>
+              <th>Order Status</th>
+              <th>Refills</th>
+              <th>Pharmacy Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in med_list %}
+              <tr>
+                <td>{{ m.name }}</td>
+                <td>{{ m.rxnorm }}</td>
+                <td>{{ m.dispense_quantity }}</td>
+                <td>{{ m.order_status }}</td>
+                <td {% if m.number_refills < 2 %}class="orange_bg"{% endif %}>
+                  {{ m.number_refills }}
+                </td>
+                <td>{{ m.pharmacy_note }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    $(function() {
+      $('#med-table tbody tr').click( function () {
+        // assuming the id is in the first column (hidden from display)
+        patient_id = table.row(this).data()[0];
+        if (patient_id) {
+          window.location.href = "/dispense/"+patient_id+'/';
+        }
+      });
+    });
+  </script>
+{% endblock %}
