@@ -16,7 +16,6 @@ def get_all(user, endpoint, parameters={}):
         url = data['next'] # A JSON null on the last page
     return results
 
-
 def get_patients(user, summary=True):
     if summary:
         return get_all(user, 'patients_summary')

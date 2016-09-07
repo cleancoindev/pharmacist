@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% block title %}Patient List{% endblock %}
 
 {% block content %}
   <div class="home">
@@ -13,7 +14,6 @@
               <th>id</th>
               <th>Last Name</th>
               <th>First Name</th>
-              <th>Doctor</th>
               <th>Gender</th>
               <th>DOB</th>
             </tr>
@@ -24,7 +24,6 @@
                 <td>{{ p.id }}</td>
                 <td>{{ p.last_name }}</td>
                 <td>{{ p.first_name }}</td>
-                <td>{{ p.doctor }}</td>
                 <td>{{ p.gender }}</td>
                 <td>{{ p.date_of_birth }}</td>
               </tr>
@@ -42,7 +41,9 @@
   <script>
     $(function() {
       var table = $('#patient-table').DataTable({
+        "stateSave": true,
         "info": false,
+        "lengthMenu": [[10,25,50,-1],[10,25,50,'All']],
         "columnDefs": [
             {
                 "targets": [0],

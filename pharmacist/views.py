@@ -1,3 +1,4 @@
+import json
 from django.db import connection
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
@@ -18,8 +19,20 @@ def patient_list(request):
 
 @login_required
 def dispense(request, patient_id):
+    all_patients = get_patients(request.user)
+    patient = filter(lambda p: p['id'] == int(patient_id), all_patients)
+    med_list = get_meds(request.user, patient_id)
+
+    # create a dict of meds indexed by id
+    med_list_json = {}
+    for m in med_list:
+        med_list_json[m['id']] = m
+    med_list_json = json.dumps(med_list_json)
+
     context = RequestContext(request, {
-        'med_list': get_meds(request.user, patient_id),
+        'patient_id': patient_id,
+        'med_list': med_list,
+        'med_list_json': med_list_json,
     })
 
     return render_to_response('dispense.html', context)

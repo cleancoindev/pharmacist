@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% block title %}Manage Medications{% endblock %}
 
 {% block content %}
   <div class="home">
@@ -20,7 +21,7 @@
           </thead>
           <tbody>
             {% for m in med_list %}
-              <tr>
+              <tr data-id="{{ m.id }}">
                 <td>{{ m.name }}</td>
                 <td>{{ m.rxnorm }}</td>
                 <td>{{ m.dispense_quantity }}</td>
@@ -38,17 +39,36 @@
 
   </div>
 
+  <div class="modal" id="med-modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title"></h4>
+        </div>
+        <div class="modal-body">
+          <p>One fine body…</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}
 
 {% block scripts %}
   <script>
+    var patient_id = {{ patient_id }};
+    var med_list = {{ med_list_json|safe }};
+    var selected_med = {};
+
     $(function() {
+      $('#med-modal').modal('hide');
       $('#med-table tbody tr').click( function () {
-        // assuming the id is in the first column (hidden from display)
-        patient_id = table.row(this).data()[0];
-        if (patient_id) {
-          window.location.href = "/dispense/"+patient_id+'/';
-        }
+        $('#med-modal').modal('show');
+        selected_med = med_list[$(this).attr('data-id')];
       });
     });
   </script>
