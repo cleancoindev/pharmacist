@@ -27,11 +27,21 @@ def dispense(request, patient_id):
 
     context = RequestContext(request, {
         'patient_id': patient_id,
-        'med_list': Medication.objects.filter(patient=patient),
         'patient_name': patient_name,
+        'med_list': Medication.objects.filter(patient=patient),
     })
 
     return render_to_response('dispense.html', context)
+
+def schedule(request, patient_id):
+    DrchronoAPI(request.user).update()
+
+    patient = Patient.objects.get(item_id=patient_id)
+    context = RequestContext(request, {
+        'patient': patient,
+    })
+
+    return render_to_response('schedule.html', context)
 
 @login_required
 def audit_log(request):
