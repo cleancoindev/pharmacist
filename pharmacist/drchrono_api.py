@@ -8,12 +8,6 @@ class DrchronoAPI:
         access_token = user.social_auth.get(user=user).extra_data['access_token']
         self.headers = {'Authorization': 'Bearer {0}'.format(access_token)}
 
-    def update(self):
-        if not Patient.objects.exists():
-            self._get_all_patients()
-        if not Medication.objects.exists():
-            self._get_all_medications()
-
     def _get_all_patients(self):
         url = 'https://drchrono.com/api/patients'
 
@@ -32,7 +26,13 @@ class DrchronoAPI:
                 Medication().save_from_dict(item)
             url = data['next']
 
-    def _patch(self, user, endpoint, item_id, parameters):
+    def update(self):
+        if not Patient.objects.exists():
+            self._get_all_patients()
+        if not Medication.objects.exists():
+            self._get_all_medications()
+
+    def patch(self, user, endpoint, item_id, parameters):
         if item_id:
             url = 'https://drchrono.com/api/{0}/{1}'.format(endpoint, item_id)
         else:
@@ -41,14 +41,10 @@ class DrchronoAPI:
         return data
 
 def dispense_med(user, form, med_id, qty):
-    #med = get_one(user, 'medications', med_id)
-    #patient = get_one(user, 'patients', med.patient.item_id)
-
     med = Medication.objects.get(item_id=med_id)
     patient = med.patient
 
     # You can't PATCH a medication over the API, so can't actually update the refills but we'll store it locally
-    # update(user, 'medications', med_id, {'number_refills': new_refills})
     med.number_refills = max([med.number_refills - qty, 0])
     med.save()
 
