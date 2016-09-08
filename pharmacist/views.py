@@ -34,8 +34,6 @@ def dispense(request, patient_id):
     return render_to_response('dispense.html', context)
 
 def schedule(request, patient_id):
-    DrchronoAPI(request.user).update()
-
     patient = Patient.objects.get(item_id=patient_id)
     context = RequestContext(request, {
         'patient': patient,
@@ -67,6 +65,10 @@ class PatientAuthView(FormView):
         email = self._get_email()
         email.state = EmailTracking.CLICKED
         email.save()
+
+        log_text = 'email appointment scheduling link clicked by {0} {1}'.format(email.patient.first_name, email.patient.first_name)
+        AuditLog(user=self.request.user, text=log_text).save()
+
         context['patient'] = email.patient
         return context
 
