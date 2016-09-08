@@ -4,8 +4,9 @@ from django.contrib.auth.models import User
 
 class Patient(models.Model):
     item_id = models.IntegerField(unique=True)
-    first_name = models.CharField(max_length=255, null=True)
-    last_name = models.CharField(max_length=255, null=True)
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    gender = models.CharField(max_length=255)
     doctor = models.IntegerField(null=True)
     date_of_birth = models.DateField(null=True)
     cell_phone = models.CharField(max_length=255, null=True)
@@ -17,6 +18,7 @@ class Patient(models.Model):
             self.item_id = data.get('id')
             self.first_name = data.get('first_name')
             self.last_name = data.get('last_name')
+            self.gender = data.get('gender')
             self.doctor = data.get('doctor')
             self.date_of_birth = data.get('date_of_birth')
             self.cell_phone = data.get('cell_phone')

@@ -46,6 +46,7 @@ thead th{
 #login-block {
     padding: 15px;
     display: inline-block;
+    width: 300px;
 }
 
 #login-block img {
