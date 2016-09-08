@@ -1,10 +1,11 @@
+import random
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+from models import EmailTracking
 
 
 def create_link_hash(patient):
-    link_hash = 'sakjfdksklfds'
-    return link_hash
+    return '%016x' % random.getrandbits(64)
 
 def send_refill_email(patient, med):
     if patient.email:
@@ -25,3 +26,5 @@ def send_refill_email(patient, med):
             fail_silently=False,
             html_message=msg_html,
         )
+
+        EmailTracking(email_hash=c['link_hash'], patient=patient, state=EmailTracking.SENT).save()

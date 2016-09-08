@@ -20,6 +20,11 @@ thead th{
     text-align: center;
 }
 
+.errorlist {
+    color: red;
+    list-style: none;
+}
+
 .home {
     margin-top: 70px;
     overflow: auto;

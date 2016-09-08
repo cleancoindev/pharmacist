@@ -1,11 +1,12 @@
 from django.shortcuts import render_to_response
 from django.views.generic import FormView
-from django.views.generic.edit import FormView
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
 from django.template import RequestContext
-from drchrono_api import DrchronoAPI, get_one, get_all, dispense_med
-from models import Patient, Medication, AuditLog
-from forms import MedicationForm
+from django.core.exceptions import ValidationError
+from drchrono_api import DrchronoAPI, dispense_med
+from models import Patient, Medication, AuditLog, EmailTracking
+from forms import MedicationForm, PatientAuthForm
 
 @login_required
 def patient_list(request):
@@ -39,6 +40,36 @@ def audit_log(request):
     })
 
     return render_to_response('audit_log.html', context)
+
+class PatientAuthView(FormView):
+    template_name = 'patient_auth.html'
+    form_class = PatientAuthForm
+
+    def _get_email(self):
+        email_hash = self.kwargs['email_hash']
+        return get_object_or_404(EmailTracking, email_hash=email_hash)
+
+    def get_success_url(self):
+        return '/schedule/{0}/'.format(self.patient.item_id)
+
+    def get_context_data(self, **kwargs):
+        context = super(PatientAuthView, self).get_context_data(**kwargs)
+        email = self._get_email()
+        email.state = EmailTracking.CLICKED
+        email.save()
+        context['patient'] = email.patient
+        return context
+
+    def form_valid(self, form):
+        email = self._get_email()
+        ssn = form.cleaned_data.get('ssn')
+        self.patient = email.patient
+        
+        if ssn != email.patient.ssn:
+            form.add_error('ssn', 'SSN does not match our records!')
+            return super(PatientAuthView, self).form_invalid(form)
+
+        return super(PatientAuthView, self).form_valid(form)
 
 class ModifyView(FormView):
     template_name = 'modify.html'

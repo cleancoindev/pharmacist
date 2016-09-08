@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Patient Authentication{% endblock %}
+
+{% block content %}
+  <div class="home">
+    <div class="row">
+      <div class="small-12 columns">
+        <div class="card text-center">
+          <div class ="card-section">
+            <h1>Welcome to the Pharmacy Dispenser</h1>
+            <p>{{ patient.first_name }}, please authenticate with our system to continue making an appointment.</p>
+          </div>
+          <div class ="card-section">
+            <form method="post" id="med-form">
+              {% csrf_token %}
+              {{ form }}
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,7 +1,7 @@
 You're low on prescription refills!
 
 
-Your prescription for {{ med.name }} {% if med.number_refills %}only has {{ med.number_refills }} refills left.{% else %}has no refills left.{% endif %}
+Your prescription for {{ med.name }} {% if med.number_refills %}only has {{ med.number_refills }} refill(s) left.{% else %}has no refills left.{% endif %}
 
 Please make an appointment with your healthcare provider by going to: http://127.0.0.1:8000/patient_auth/{{ link_hash }}
 

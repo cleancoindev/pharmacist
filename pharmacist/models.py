@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from localflavor.us.models import USSocialSecurityNumberField
 
 
 class Patient(models.Model):
@@ -12,6 +13,7 @@ class Patient(models.Model):
     cell_phone = models.CharField(max_length=255, null=True)
     email = models.EmailField(null=True)
     state = models.CharField(max_length=255, null=True)
+    ssn = USSocialSecurityNumberField(null=True)
 
     def save_from_dict(self, data):
         if not Patient.objects.filter(item_id=data.get('id')).exists():
@@ -23,6 +25,7 @@ class Patient(models.Model):
             self.date_of_birth = data.get('date_of_birth')
             self.cell_phone = data.get('cell_phone')
             self.email = data.get('email')
+            self.ssn = data.get('social_security_number')
             self.state = data.get('state')
             self.save()
 
@@ -64,4 +67,4 @@ class EmailTracking(models.Model):
 
     email_hash = models.CharField(max_length=255, unique=True, db_index=True)
     patient = models.ForeignKey(Patient)
-    state = models.CharField(max_length=20, choices=STATE_CHOICES)
+    state = models.CharField(max_length=20, choices=STATE_CHOICES, default=SENT)
