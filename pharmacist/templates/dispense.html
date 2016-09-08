@@ -13,8 +13,6 @@
             <tr>
               <th>Medication</th>
               <th>RxNorm</th>
-              <th>Dispense</th>
-              <th>Order Status</th>
               <th>Refills</th>
               <th>Pharmacy Note</th>
             </tr>
@@ -24,8 +22,6 @@
               <tr data-id="{{ m.item_id }}">
                 <td>{{ m.name }}</td>
                 <td>{{ m.rxnorm }}</td>
-                <td>{{ m.dispense_quantity }}</td>
-                <td>{{ m.order_status }}</td>
                 <td {% if m.number_refills < 2 %}class="orange_bg"{% endif %}>
                   {{ m.number_refills }}
                 </td>

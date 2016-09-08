@@ -77,13 +77,11 @@ def update(user, endpoint, item_id, parameters):
 def dispense_med(user, form, med_id, qty):
     med = get_one(user, 'medications', med_id)
     patient = get_one(user, 'patients', med.patient.item_id)
+
+    # You can't PATCH a medication over the API, so can't actually update the refills but we'll store it locally
+    # update(user, 'medications', med_id, {'number_refills': new_refills})
     med.number_refills = max([med.number_refills - qty, 0])
     med.save()
-
-    # You can't PATCH a medication over the API, so can't actually update the refills -- name a note instead
-    # update(user, 'medications', med_id, {'number_refills': new_refills})
-    note_text = str(med.number_refills) + ' refills remain'
-    update(user, 'medications/{0}/append_to_pharmacy_note'.format(med_id), None, {'text': note_text})
 
     log_text = 'dispensed {0} x {1} to {2} {3}'.format(qty, med.name, patient.first_name, patient.last_name)
     AuditLog(user=user, text=log_text).save()
