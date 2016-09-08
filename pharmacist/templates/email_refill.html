@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <body style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;">
+    <table style="min-width: 380px; max-width: 600px; color: black;" border="0" cellspacing="0" cellpadding="10">
+        <tr>
+            <td style="text-align: center;">
+              <img src="http://i.imgur.com/Mos2chy.jpg" alt="logo" width=100>
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align: center; font-weight: lighter; font-size: 40px;">
+              <p style="border-bottom: 1px solid #ccc;">
+                You're low on prescription refills!
+              </p>
+            </td>
+        </tr>
+        <tr>
+          <td style="text-align: center; font-size: 14px;">
+            <p>
+              Your prescription for {{ med.name }} 
+              {% if med.number_refills %}
+                only has {{ med.number_refills }} refills left.
+              {% else %}
+                has no refills left.
+              {% endif %}
+            </p>
+            <p>
+              Please make an appointment with your healthcare provider
+              by following this link:
+              <a href="http://127.0.0.1:8000/patient_auth/{{ link_hash }}/">http://127.0.0.1:8000/patient_auth/{{ link_hash }}/</a>
+            </p>
+          </td>
+        </tr>
+        <tr>
+            <td style="text-align: center; font-size: 14px;">
+              <p style="margin-top: 40px; padding: 10px; background-color: #eee; color: #2F697F; font-size: 12px;">
+              This is an automated message from the Drchrono Pharmacy Dispenser.<br>
+              <a href="#">Click here to unsubscribe</a> from these notifications.
+              </p>
+            </td>
+        </tr>
+    </table>

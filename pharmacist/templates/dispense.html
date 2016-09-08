@@ -19,7 +19,7 @@
           </thead>
           <tbody>
             {% for m in med_list %}
-              <tr data-id="{{ m.item_id }}">
+              <tr data-id="{{ m.item_id }}" data-refills="{{ m.number_refills }}">
                 <td>{{ m.name }}</td>
                 <td>{{ m.rxnorm }}</td>
                 <td {% if m.number_refills < 2 %}class="orange_bg"{% endif %}>
@@ -57,17 +57,23 @@
 {% block scripts %}
   <script>
     var patient_id = {{ patient_id }};
-    var selected_med = {};
+    var selected_row = null;
+
+    function form_url(){
+      var selected_med = $(selected_row).attr('data-id');
+      var max_refills = $(selected_row).attr('data-refills');
+      return ['/modify', selected_med, max_refills, null].join('/');
+    }
 
     $(function() {
       $('#med-modal').modal('hide');
       $('#med-table tbody tr').click( function () {
-        selected_med = $(this).attr('data-id');
-        $('#med-modal-body').load('/modify/'+selected_med+'/');
+        selected_row = this;
+        $('#med-modal-body').load(form_url());
         $('#med-modal').modal('show');
       });
       $('#modal-save-button').click(function(){
-        $('#med-form').ajaxSubmit({url: '/modify/'+selected_med+'/', type: 'post', success: function(){
+        $('#med-form').ajaxSubmit({url: form_url(), type: 'post', success: function(){
           $('#med-modal').modal('hide');
           location.reload();
           }

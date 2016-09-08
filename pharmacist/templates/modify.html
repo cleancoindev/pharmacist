@@ -1,6 +1,11 @@
 {% load static %}
 
-<form action="/modify/{{ med_id }}/" method="post" id="med-form">
+<form method="post" id="med-form">
     {% csrf_token %}
-    {{ form }}
+    <label for="id_quantity_to_dispense">Quantity to dispense:</label>
+    <select id="id_quantity_to_dispense" name="quantity_to_dispense">
+        {% for i in refills %}
+            <option value="{{ i }}">{{ i }}</option>
+        {% endfor %}
+    </select>
 </form>

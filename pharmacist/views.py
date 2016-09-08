@@ -3,28 +3,31 @@ from django.views.generic import FormView
 from django.views.generic.edit import FormView
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
-from drchrono_api import get_one, get_all, dispense_med
-from models import AuditLog
+from drchrono_api import DrchronoAPI, get_one, get_all, dispense_med
+from models import Patient, Medication, AuditLog
 from forms import MedicationForm
 
 @login_required
 def patient_list(request):
+    DrchronoAPI(request.user).update()
+
     context = RequestContext(request, {
-        'patient_list': get_all(request.user, 'patients').values(),
+        'patient_list': Patient.objects.all(),
     })
 
     return render_to_response('patient_list.html', context)
 
 @login_required
 def dispense(request, patient_id):
-    patient = get_one(request.user, 'patients', patient_id)
-    med_list = get_all(request.user, 'medications', {'patient': patient_id}, patient=patient_id)
-    name = '{0} {1}'.format(patient.first_name, patient.last_name)
+    DrchronoAPI(request.user).update()
+
+    patient = Patient.objects.get(item_id=patient_id)
+    patient_name = '{0} {1}'.format(patient.first_name, patient.last_name)
 
     context = RequestContext(request, {
         'patient_id': patient_id,
-        'med_list': med_list,
-        'patient_name': name,
+        'med_list': Medication.objects.filter(patient=patient),
+        'patient_name': patient_name,
     })
 
     return render_to_response('dispense.html', context)
@@ -45,6 +48,7 @@ class ModifyView(FormView):
     def get_context_data(self, **kwargs):
         context = super(ModifyView, self).get_context_data(**kwargs)
         context['med_id'] = self.kwargs['med_id']
+        context['refills'] = xrange(1, int(self.kwargs['max_refills'])+1)
         return context
 
     def form_valid(self, form):

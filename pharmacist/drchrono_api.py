@@ -1,7 +1,36 @@
 import requests, urllib
-from django.forms import model_to_dict
-from email import send_appt_email, send_refill_email
+from email import send_refill_email
 from models import Patient, Medication, AuditLog
+
+
+class DrchronoAPI:
+    def __init__(self, user):
+        access_token = user.social_auth.get(user=user).extra_data['access_token']
+        self.headers = {'Authorization': 'Bearer {0}'.format(access_token)}
+
+    def update(self):
+        if not Patient.objects.exists():
+            self._get_all_patients()
+        if not Medication.objects.exists():
+            self._get_all_medications()
+
+    def _get_all_patients(self):
+        url = 'https://drchrono.com/api/patients'
+
+        # Fetch the objects one "page" at a time until they are all loaded
+        while url:
+            data = requests.get(url, headers=self.headers).json()
+            for item in data['results']:
+                Patient().save_from_dict(item)
+            url = data['next']      # Value = None on the last page
+
+    def _get_all_medications(self):
+        url = 'https://drchrono.com/api/medications'
+        while url:
+            data = requests.get(url, headers=self.headers).json()
+            for item in data['results']:
+                Medication().save_from_dict(item)
+            url = data['next']
 
 
 endpoint_models = {
@@ -75,8 +104,11 @@ def update(user, endpoint, item_id, parameters):
     return data
 
 def dispense_med(user, form, med_id, qty):
-    med = get_one(user, 'medications', med_id)
-    patient = get_one(user, 'patients', med.patient.item_id)
+    #med = get_one(user, 'medications', med_id)
+    #patient = get_one(user, 'patients', med.patient.item_id)
+
+    med = Medication.objects.get(item_id=med_id)
+    patient = med.patient
 
     # You can't PATCH a medication over the API, so can't actually update the refills but we'll store it locally
     # update(user, 'medications', med_id, {'number_refills': new_refills})
@@ -88,12 +120,6 @@ def dispense_med(user, form, med_id, qty):
 
     # If the remaining refills drops below 2, send a reminder email
     if med.number_refills < 2:
-        # If there's a pharmacy note containing "appt", then send an appointment email
-        if 'appt' in med.pharmacy_note.lower():
-            send_appt_email(patient, med)
-        else:
-            # Regular refill reminder without an appointment needed
-            send_refill_email(patient, med)
-
+        send_refill_email(patient, med)
         log_text = 'sent reminder email to {0} {1} at {2}'.format(patient.first_name, patient.last_name, patient.email)
         AuditLog(user=user, text=log_text).save()

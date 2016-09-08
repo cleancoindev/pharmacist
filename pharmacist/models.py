@@ -50,3 +50,18 @@ class AuditLog(models.Model):
     user = models.ForeignKey(User)
     timestamp = models.DateTimeField(auto_now_add=True)
     text = models.CharField(max_length=255)
+
+class EmailTracking(models.Model):
+    SENT = 'sent'
+    CLICKED = 'clicked'
+    SCHEDULED = 'scheduled'
+
+    STATE_CHOICES = (
+        (SENT, 'email sent'),
+        (CLICKED, 'link clicked'),
+        (SCHEDULED, 'appointment scheduled'),
+    )
+
+    email_hash = models.CharField(max_length=255, unique=True, db_index=True)
+    patient = models.ForeignKey(Patient)
+    state = models.CharField(max_length=20, choices=STATE_CHOICES)
