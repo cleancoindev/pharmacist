@@ -67,7 +67,7 @@ class PatientAuthView(FormView):
         email.save()
 
         log_text = 'email appointment scheduling link clicked by {0} {1}'.format(email.patient.first_name, email.patient.first_name)
-        AuditLog(user=self.request.user, text=log_text).save()
+        AuditLog(user=None, text=log_text).save()
 
         context['patient'] = email.patient
         return context

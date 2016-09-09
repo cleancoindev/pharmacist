@@ -50,7 +50,7 @@ class Medication(models.Model):
             self.save()
 
 class AuditLog(models.Model):
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     text = models.CharField(max_length=255)
 
